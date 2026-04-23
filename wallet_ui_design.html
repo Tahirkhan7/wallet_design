@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CryptoVault — Desktop Wallet UI Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg-deepest: #050810;
+  --bg-deep:    #080d1a;
+  --bg-card:    #0d1528;
+  --bg-card2:   #111d35;
+  --bg-hover:   #162040;
+  --border:     rgba(255,255,255,0.07);
+  --border-bright: rgba(255,255,255,0.13);
+  --accent:     #4f8ef7;
+  --accent2:    #7c5cfc;
+  --accent3:    #22d3c5;
+  --accent-gold:#f5a623;
+  --accent-red: #ff4d4d;
+  --accent-green:#22d36a;
+  --text-primary:  #f0f4ff;
+  --text-secondary:#8896b3;
+  --text-muted:    #4a5878;
+  --glow:       0 0 24px rgba(79,142,247,0.18);
+  --glow-purple:0 0 28px rgba(124,92,252,0.22);
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  22px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg-deepest);
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Navigation Tabs ── */
+.nav-tabs {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+  background: rgba(5,8,16,0.94);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0;
+  padding: 0 32px;
+  height: 56px;
+}
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 800;
+  background: linear-gradient(130deg, #4f8ef7, #7c5cfc, #22d3c5);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-right: 32px; letter-spacing: -0.5px;
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-logo-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #4f8ef7, #7c5cfc);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.tab-btn {
+  padding: 0 18px; height: 56px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-secondary); font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.3px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s; white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.screen-label {
+  margin-left: auto;
+  font-size: 11px; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Screens ── */
+.screen { display: none; min-height: calc(100vh - 56px); margin-top: 56px; }
+.screen.active { display: block; }
+
+/* ════════════════════════════════════════
+   SCREEN 1 — Onboarding / Welcome
+════════════════════════════════════════ */
+.onboard-wrap {
+  min-height: calc(100vh - 56px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 24px;
+  position: relative; overflow: hidden;
+}
+.orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none;
+}
+.orb-1 { width: 500px; height: 500px; background: rgba(79,142,247,0.12); top: -120px; left: -100px; }
+.orb-2 { width: 420px; height: 420px; background: rgba(124,92,252,0.10); bottom: -80px; right: -60px; }
+.orb-3 { width: 280px; height: 280px; background: rgba(34,211,197,0.08); top: 40%; left: 50%; }
+
+.onboard-badge {
+  font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--accent3); background: rgba(34,211,197,0.1); border: 1px solid rgba(34,211,197,0.2);
+  padding: 5px 14px; border-radius: 100px; margin-bottom: 28px; font-family: 'JetBrains Mono', monospace;
+}
+.onboard-title {
+  font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; line-height: 1.05;
+  text-align: center; letter-spacing: -2px; max-width: 720px; margin-bottom: 20px;
+}
+.onboard-title .grad {
+  background: linear-gradient(130deg, #4f8ef7 0%, #7c5cfc 50%, #22d3c5 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.onboard-sub {
+  font-size: 17px; color: var(--text-secondary); text-align: center; max-width: 520px;
+  line-height: 1.7; margin-bottom: 48px;
+}
+.onboard-actions { display: flex; gap: 16px; margin-bottom: 80px; }
+.btn-primary {
+  padding: 14px 32px; border-radius: var(--radius-md);
+  background: linear-gradient(130deg, #4f8ef7, #7c5cfc);
+  color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600;
+  border: none; cursor: pointer; letter-spacing: 0.2px;
+  box-shadow: 0 4px 24px rgba(79,142,247,0.35);
+  transition: all 0.2s;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(79,142,247,0.45); }
+.btn-secondary {
+  padding: 14px 32px; border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.05); color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 500;
+  border: 1px solid var(--border-bright); cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.09); }
+.feature-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 860px; width: 100%;
+}
+.feature-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.feature-card:hover { border-color: var(--border-bright); transform: translateY(-2px); }
+.feature-icon {
+  width: 42px; height: 42px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 14px;
+}
+.feature-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.feature-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ════════════════════════════════════════
+   SCREEN 2 — Wallet Creation / Mnemonic
+════════════════════════════════════════ */
+.create-layout {
+  display: flex; min-height: calc(100vh - 56px);
+}
+.create-sidebar {
+  width: 340px; flex-shrink: 0;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 48px 32px;
+  display: flex; flex-direction: column;
+}
+.create-steps { flex: 1; }
+.step-item {
+  display: flex; align-items: flex-start; gap: 14px; margin-bottom: 32px;
+}
+.step-num {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; transition: all 0.3s;
+}
+.step-num.done { background: linear-gradient(135deg,#22d3c5,#4f8ef7); color: #fff; }
+.step-num.active { background: linear-gradient(135deg,#4f8ef7,#7c5cfc); color: #fff; box-shadow: 0 0 16px rgba(79,142,247,0.4); }
+.step-num.pending { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--border); }
+.step-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.step-info p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.step-line { width: 1px; height: 20px; background: var(--border); margin: 2px 0 2px 15px; }
+
+.create-main { flex: 1; padding: 48px 56px; overflow-y: auto; }
+.create-header { margin-bottom: 40px; }
+.create-header h2 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.create-header p { font-size: 14px; color: var(--text-secondary); }
+
+.mnemonic-alert {
+  background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.2);
+  border-radius: var(--radius-md); padding: 14px 18px;
+  display: flex; align-items: flex-start; gap: 12px; margin-bottom: 28px;
+}
+.mnemonic-alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.mnemonic-alert p { font-size: 13px; color: #f5c470; line-height: 1.6; }
+
+.mnemonic-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 32px;
+}
+.mnemonic-word {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.word-num { font-size: 10px; font-weight: 600; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; min-width: 16px; }
+.word-text { font-size: 13px; font-weight: 500; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+
+.password-section { margin-bottom: 32px; }
+.form-label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; display: block; }
+.form-input {
+  width: 100%; background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 16px; color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif; font-size: 14px;
+  outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text-muted); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+.strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+.strength-seg {
+  height: 3px; flex: 1; border-radius: 2px; background: rgba(255,255,255,0.08);
+}
+.strength-seg.filled { background: linear-gradient(90deg, #4f8ef7, #7c5cfc); }
+
+/* ════════════════════════════════════════
+   SCREEN 3 — Dashboard
+════════════════════════════════════════ */
+.dashboard-layout { display: flex; min-height: calc(100vh - 56px); }
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: var(--bg-card); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 24px 0;
+}
+.sidebar-wallet {
+  padding: 0 20px 24px; border-bottom: 1px solid var(--border); margin-bottom: 16px;
+}
+.wallet-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #4f8ef7, #7c5cfc);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; margin-bottom: 10px;
+}
+.wallet-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.wallet-addr {
+  font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.nav-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+.nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: rgba(79,142,247,0.07); }
+.nav-item-icon { font-size: 16px; }
+
+.nav-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-muted); padding: 20px 20px 8px; font-family: 'JetBrains Mono', monospace;
+}
+
+.dash-main { flex: 1; overflow-y: auto; padding: 32px 36px; background: var(--bg-deep); }
+
+/* Balance hero */
+.balance-hero {
+  background: linear-gradient(135deg, #0e1a35 0%, #0d1528 60%, #0a1422 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 36px 40px; margin-bottom: 24px;
+  position: relative; overflow: hidden;
+}
+.balance-hero::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,142,247,0.12) 0%, transparent 70%);
+}
+.balance-hero::after {
+  content: ''; position: absolute; bottom: -40px; left: 20px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,92,252,0.09) 0%, transparent 70%);
+}
+.balance-label { font-size: 12px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase; }
+.balance-amount { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; letter-spacing: -2px; margin-bottom: 6px; }
+.balance-change { font-size: 14px; margin-bottom: 28px; }
+.balance-change .up { color: var(--accent-green); }
+.action-btns { display: flex; gap: 12px; }
+.action-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 22px; border-radius: var(--radius-md);
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; border: none;
+}
+.action-btn.primary { background: linear-gradient(130deg, #4f8ef7, #7c5cfc); color: #fff; box-shadow: 0 4px 16px rgba(79,142,247,0.3); }
+.action-btn.primary:hover { box-shadow: 0 6px 24px rgba(79,142,247,0.45); transform: translateY(-1px); }
+.action-btn.ghost { background: rgba(255,255,255,0.07); color: var(--text-primary); border: 1px solid var(--border-bright); }
+.action-btn.ghost:hover { background: rgba(255,255,255,0.11); }
+
+/* Chart area */
+.chart-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px;
+}
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.chart-title { font-size: 15px; font-weight: 600; }
+.chart-tabs { display: flex; gap: 4px; }
+.chart-tab {
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; border: none; font-family: 'Space Grotesk', sans-serif;
+}
+.chart-tab.active { background: rgba(79,142,247,0.15); color: var(--accent); }
+.chart-tab:not(.active) { background: none; color: var(--text-muted); }
+.chart-canvas { height: 140px; position: relative; }
+.chart-line {
+  width: 100%; height: 100%;
+}
+
+/* Assets list */
+.assets-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.assets-title { font-size: 15px; font-weight: 600; }
+.view-all { font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 500; }
+.asset-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.asset-row:last-child { border-bottom: none; }
+.asset-icon {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.asset-info { flex: 1; }
+.asset-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.asset-balance { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
+.asset-value { text-align: right; }
+.asset-usd { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.asset-pct { font-size: 12px; font-weight: 500; }
+.up { color: var(--accent-green); }
+.down { color: var(--accent-red); }
+
+/* Portfolio donut placeholder */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+}
+.stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+.stat-val { font-size: 22px; font-weight: 700; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+.stat-sub { font-size: 12px; color: var(--text-secondary); }
+
+/* ════════════════════════════════════════
+   SCREEN 4 — Send Transaction
+════════════════════════════════════════ */
+.send-layout { display: flex; min-height: calc(100vh - 56px); }
+.send-main { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 48px 32px; background: var(--bg-deep); }
+.send-card {
+  width: 100%; max-width: 540px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 40px;
+}
+.send-header { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+.send-chain-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border-bright);
+  border-radius: 100px; padding: 5px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+}
+.send-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; flex: 1; }
+
+.recipient-input-wrap {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 16px 18px; margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.recipient-input-wrap:focus-within { border-color: var(--accent); }
+.input-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.addr-input {
+  width: 100%; background: none; border: none; outline: none;
+  color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 13px;
+}
+.addr-input::placeholder { color: var(--text-muted); }
+
+.amount-wrap {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 16px 18px; margin-bottom: 16px;
+}
+.amount-row { display: flex; align-items: center; gap: 12px; }
+.amount-input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text-primary); font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700;
+}
+.amount-input::placeholder { color: var(--text-muted); }
+.amount-token {
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm); padding: 6px 12px; font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+}
+.amount-usd { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+.max-btn { font-size: 11px; font-weight: 700; color: var(--accent); cursor: pointer; letter-spacing: 0.5px; }
+
+/* Fee selector */
+.fee-section { margin-bottom: 24px; }
+.fee-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; }
+.fee-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.fee-opt {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px; cursor: pointer;
+  transition: all 0.2s; text-align: center;
+}
+.fee-opt.selected { border-color: var(--accent); background: rgba(79,142,247,0.08); }
+.fee-opt-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.4px; }
+.fee-opt-gwei { font-size: 13px; font-weight: 700; margin: 4px 0; }
+.fee-opt-time { font-size: 11px; color: var(--text-muted); }
+
+/* Summary box */
+.tx-summary {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 16px 18px; margin-bottom: 24px;
+}
+.tx-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
+.tx-row:last-child { margin-bottom: 0; padding-top: 10px; border-top: 1px solid var(--border); }
+.tx-row-label { color: var(--text-secondary); }
+.tx-row-val { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.tx-row-val.total { color: var(--accent); font-size: 15px; }
+
+.send-submit {
+  width: 100%; padding: 15px; border: none; cursor: pointer;
+  background: linear-gradient(130deg, #4f8ef7, #7c5cfc);
+  color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700;
+  border-radius: var(--radius-md); box-shadow: 0 4px 24px rgba(79,142,247,0.35);
+  transition: all 0.2s; letter-spacing: 0.2px;
+}
+.send-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(79,142,247,0.45); }
+
+/* Send right panel */
+.send-side {
+  width: 340px; background: var(--bg-card); border-left: 1px solid var(--border);
+  padding: 48px 28px; overflow-y: auto;
+}
+.recent-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'JetBrains Mono', monospace; }
+.recent-addr {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.addr-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+}
+.recent-info h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.recent-info p { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+/* ════════════════════════════════════════
+   SCREEN 5 — Receive
+════════════════════════════════════════ */
+.receive-layout {
+  display: flex; min-height: calc(100vh - 56px); align-items: flex-start;
+  justify-content: center; padding: 60px 24px; background: var(--bg-deep); gap: 32px;
+}
+.receive-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); padding: 40px; width: 420px;
+}
+.receive-card h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+.receive-card .sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 32px; }
+.chain-selector {
+  display: flex; gap: 8px; margin-bottom: 28px; overflow-x: auto; padding-bottom: 4px;
+}
+.chain-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap; border: 1px solid var(--border);
+  background: var(--bg-card2); color: var(--text-secondary);
+}
+.chain-pill.active { background: rgba(79,142,247,0.12); color: var(--accent); border-color: rgba(79,142,247,0.3); }
+
+.qr-frame {
+  width: 200px; height: 200px; margin: 0 auto 28px;
+  background: #fff; border-radius: var(--radius-lg); padding: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.qr-inner {
+  width: 100%; height: 100%; display: grid; grid-template-columns: repeat(21,1fr); grid-template-rows: repeat(21,1fr); gap: 1px;
+}
+.addr-display {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.addr-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary); flex: 1; word-break: break-all; line-height: 1.6; }
+.copy-btn {
+  padding: 7px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-bright);
+  background: rgba(255,255,255,0.05); color: var(--text-primary);
+  font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+  font-family: 'Space Grotesk', sans-serif; flex-shrink: 0;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.09); }
+
+/* Receive right info card */
+.receive-info {
+  width: 380px;
+}
+.info-block {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px;
+}
+.info-block h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.tx-hist-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.tx-hist-item:last-child { border-bottom: none; }
+.tx-hist-icon {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.tx-hist-icon.recv { background: rgba(34,211,106,0.12); }
+.tx-hist-icon.send { background: rgba(255,77,77,0.10); }
+.tx-hist-info h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.tx-hist-info p { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.tx-hist-val { text-align: right; margin-left: auto; }
+.tx-hist-val .amt { font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+/* ════════════════════════════════════════
+   SCREEN 6 — Settings
+════════════════════════════════════════ */
+.settings-layout { display: flex; min-height: calc(100vh - 56px); }
+.settings-nav {
+  width: 260px; background: var(--bg-card); border-right: 1px solid var(--border); padding: 32px 0;
+}
+.settings-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 24px; font-size: 13px; font-weight: 500; cursor: pointer;
+  color: var(--text-secondary); border-left: 2px solid transparent; transition: all 0.15s;
+}
+.settings-nav-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+.settings-nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: rgba(79,142,247,0.07); }
+.settings-nav-section { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); padding: 20px 24px 8px; font-family: 'JetBrains Mono', monospace; }
+
+.settings-main { flex: 1; padding: 48px 56px; overflow-y: auto; background: var(--bg-deep); }
+.settings-section { margin-bottom: 40px; }
+.settings-section-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.settings-section-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; }
+
+.settings-group {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px;
+}
+.setting-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 24px; border-bottom: 1px solid var(--border);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-icon { font-size: 18px; width: 32px; flex-shrink: 0; }
+.setting-info { flex: 1; }
+.setting-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.setting-info p { font-size: 12px; color: var(--text-secondary); }
+.toggle {
+  width: 42px; height: 24px; border-radius: 100px;
+  position: relative; cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+}
+.toggle.on { background: linear-gradient(130deg,#4f8ef7,#7c5cfc); }
+.toggle.off { background: rgba(255,255,255,0.1); }
+.toggle-thumb {
+  position: absolute; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
+  transition: left 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle.on .toggle-thumb { left: 21px; }
+.toggle.off .toggle-thumb { left: 3px; }
+.setting-select {
+  background: var(--bg-card2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 12px; color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif; font-size: 13px; outline: none; cursor: pointer;
+}
+
+/* Security card */
+.security-card {
+  background: linear-gradient(135deg, rgba(79,142,247,0.08), rgba(124,92,252,0.06));
+  border: 1px solid rgba(79,142,247,0.2); border-radius: var(--radius-lg); padding: 24px;
+  margin-bottom: 24px;
+}
+.security-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.security-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+.security-score {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+}
+.score-ring {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: conic-gradient(#22d36a 0deg 270deg, rgba(255,255,255,0.06) 270deg);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.score-inner { width: 48px; height: 48px; border-radius: 50%; background: var(--bg-card2); display: flex; align-items: center; justify-content: center; }
+.score-num { font-size: 16px; font-weight: 800; font-family: 'Syne', sans-serif; }
+.score-info h4 { font-size: 15px; font-weight: 700; }
+.score-info p { font-size: 12px; color: var(--text-secondary); }
+
+/* RPC config */
+.rpc-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 24px; border-bottom: 1px solid var(--border);
+}
+.rpc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.rpc-dot.green { background: var(--accent-green); }
+.rpc-name { font-size: 13px; font-weight: 600; flex: 1; }
+.rpc-url { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+.rpc-latency { font-size: 11px; color: var(--accent-green); font-family: 'JetBrains Mono', monospace; }
+.rpc-edit { font-size: 12px; color: var(--accent); cursor: pointer; }
+
+/* ════════ Global utils ════════ */
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+.badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+}
+.badge-blue { background: rgba(79,142,247,0.15); color: var(--accent); }
+.badge-green { background: rgba(34,211,106,0.12); color: var(--accent-green); }
+.badge-purple { background: rgba(124,92,252,0.15); color: #a88cf8; }
+.badge-gold { background: rgba(245,166,35,0.12); color: var(--accent-gold); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* SVG Chart line */
+.sparkline { overflow: visible; }
+
+</style>
+</head>
+<body>
+
+<!-- ══ TOP NAV ══ -->
+<nav class="nav-tabs">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="8,2 14,6 14,10 8,14 2,10 2,6" fill="none" stroke="white" stroke-width="1.5"/><circle cx="8" cy="8" r="2.5" fill="white"/></svg>
+    </div>
+    CryptoVault
+  </div>
+  <button class="tab-btn" onclick="showScreen('onboard')">Welcome</button>
+  <button class="tab-btn" onclick="showScreen('create')">Create Wallet</button>
+  <button class="tab-btn active" onclick="showScreen('dashboard')">Dashboard</button>
+  <button class="tab-btn" onclick="showScreen('send')">Send</button>
+  <button class="tab-btn" onclick="showScreen('receive')">Receive</button>
+  <button class="tab-btn" onclick="showScreen('settings')">Settings</button>
+  <span class="screen-label">UI DESIGN PROTOTYPE</span>
+</nav>
+
+<!-- ══════════════════════════════
+     SCREEN 1: ONBOARDING
+══════════════════════════════ -->
+<div class="screen" id="screen-onboard">
+  <div class="onboard-wrap">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="onboard-badge">Self-Custody · Multi-Chain · Desktop Native</div>
+    <h1 class="onboard-title">Your Keys.<br/><span class="grad">Your Crypto.</span><br/>Your Freedom.</h1>
+    <p class="onboard-sub">CryptoVault is a non-custodial desktop wallet giving you complete control over your assets across Bitcoin, Ethereum, Solana, and BNB Chain — with military-grade encryption.</p>
+    <div class="onboard-actions">
+      <button class="btn-primary" onclick="showScreen('create')">Create New Wallet</button>
+      <button class="btn-secondary">Import Existing Wallet</button>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(79,142,247,0.12);">🔐</div>
+        <h3>True Self-Custody</h3>
+        <p>Private keys never leave your device. All signing happens locally in isolated process.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(34,211,197,0.1);">⛓️</div>
+        <h3>Multi-Chain Support</h3>
+        <p>Bitcoin, Ethereum, Solana, BSC — powered by TrustWallet Core with BIP44 derivation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(124,92,252,0.12);">🛡️</div>
+        <h3>AES-256 Encryption</h3>
+        <p>Keystore encrypted with PBKDF2 + AES-256-GCM. Your password never stored anywhere.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(245,166,35,0.1);">📊</div>
+        <h3>Live Portfolio</h3>
+        <p>Real-time balances and USD values powered by CoinGecko API integration.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(34,211,106,0.1);">📱</div>
+        <h3>QR Code Scanner</h3>
+        <p>Scan recipient addresses or generate QR codes for incoming transfers instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(255,77,77,0.08);">⚡</div>
+        <h3>Smart Fee Engine</h3>
+        <p>EIP-1559 dynamic fees for ETH, UTXO selection for BTC, compute units for SOL.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 2: CREATE WALLET
+══════════════════════════════ -->
+<div class="screen" id="screen-create">
+  <div class="create-layout">
+    <div class="create-sidebar">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:36px;background:linear-gradient(130deg,#4f8ef7,#7c5cfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+        ◆ CryptoVault Setup
+      </div>
+      <div class="create-steps">
+        <div class="step-item">
+          <div class="step-num done">✓</div>
+          <div class="step-info"><h4>Generate Mnemonic</h4><p>12-word BIP39 seed phrase generated securely</p></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+          <div class="step-num active">2</div>
+          <div class="step-info"><h4>Backup Phrase</h4><p>Write down and confirm your recovery words</p></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+          <div class="step-num pending">3</div>
+          <div class="step-info"><h4>Set Password</h4><p>Encrypt your keystore with a strong password</p></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+          <div class="step-num pending">4</div>
+          <div class="step-info"><h4>Select Chains</h4><p>Choose networks to activate in your wallet</p></div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-item">
+          <div class="step-num pending">5</div>
+          <div class="step-info"><h4>Ready!</h4><p>Launch your dashboard and fund your wallet</p></div>
+        </div>
+      </div>
+      <div style="margin-top:auto;padding-top:24px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">
+          🔒 All sensitive operations run in the Electron main process. The renderer never sees your private keys.
+        </div>
+      </div>
+    </div>
+
+    <div class="create-main">
+      <div class="create-header">
+        <h2>Back Up Your Recovery Phrase</h2>
+        <p>Write these 12 words in order and store them somewhere safe. Anyone with this phrase can access your wallet.</p>
+      </div>
+
+      <div class="mnemonic-alert">
+        <span class="mnemonic-alert-icon">⚠️</span>
+        <p><strong>Never share your seed phrase.</strong> CryptoVault support will never ask for it. Store offline in a secure location — never in screenshots, email, or cloud storage.</p>
+      </div>
+
+      <div class="mnemonic-grid" id="mnemonic-grid"></div>
+
+      <div style="display:flex;gap:12px;margin-bottom:36px;">
+        <button class="btn-secondary" style="font-size:13px;padding:10px 18px;" onclick="regenerateMnemonic()">🔄 Regenerate</button>
+        <button class="btn-secondary" style="font-size:13px;padding:10px 18px;">📋 Copy to Clipboard</button>
+        <button class="btn-secondary" style="font-size:13px;padding:10px 18px;" id="revealBtn" onclick="toggleReveal()">👁 Reveal Words</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="margin-bottom:24px;">
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:6px;">Set Wallet Password</h3>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">Used to encrypt your keystore file. Without this, the wallet cannot be unlocked.</p>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" placeholder="Min. 12 characters" id="pwd-input" oninput="checkStrength(this.value)"/>
+            <div class="strength-bar" style="margin-top:8px;">
+              <div class="strength-seg" id="s1"></div>
+              <div class="strength-seg" id="s2"></div>
+              <div class="strength-seg" id="s3"></div>
+              <div class="strength-seg" id="s4"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;" id="strength-label">Enter a password</div>
+          </div>
+          <div>
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-input" placeholder="Repeat password"/>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:28px;">
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:16px;">Select Chains to Activate</h3>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+          <div style="background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.25);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+            <span style="font-size:24px;">₿</span>
+            <div><div style="font-size:13px;font-weight:600;">Bitcoin</div><div style="font-size:11px;color:var(--text-muted);">BTC · UTXO</div></div>
+            <div style="margin-left:auto;width:18px;height:18px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;">✓</div>
+          </div>
+          <div style="background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.25);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+            <span style="font-size:24px;">Ξ</span>
+            <div><div style="font-size:13px;font-weight:600;">Ethereum</div><div style="font-size:11px;color:var(--text-muted);">ETH · EVM</div></div>
+            <div style="margin-left:auto;width:18px;height:18px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;">✓</div>
+          </div>
+          <div style="background:rgba(34,211,197,0.06);border:1px solid rgba(34,211,197,0.2);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+            <span style="font-size:24px;">◎</span>
+            <div><div style="font-size:13px;font-weight:600;">Solana</div><div style="font-size:11px;color:var(--text-muted);">SOL · Sealevel</div></div>
+            <div style="margin-left:auto;width:18px;height:18px;border-radius:50%;background:var(--accent3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;">✓</div>
+          </div>
+          <div style="background:rgba(245,166,35,0.06);border:1px solid rgba(245,166,35,0.15);border-radius:var(--radius-md);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+            <span style="font-size:24px;">🔶</span>
+            <div><div style="font-size:13px;font-weight:600;">BNB Chain</div><div style="font-size:11px;color:var(--text-muted);">BSC · EVM</div></div>
+            <div style="margin-left:auto;width:18px;height:18px;border-radius:50%;background:var(--accent-gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000;">✓</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="showScreen('dashboard')" style="width:100%;padding:15px;font-size:15px;font-weight:700;border-radius:var(--radius-md);">Continue → Verify Phrase</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 3: DASHBOARD
+══════════════════════════════ -->
+<div class="screen active" id="screen-dashboard">
+  <div class="dashboard-layout">
+    <div class="sidebar">
+      <div class="sidebar-wallet">
+        <div class="wallet-avatar">W</div>
+        <div class="wallet-name">Main Wallet</div>
+        <div class="wallet-addr">0x4f2c…8b3e</div>
+      </div>
+      <div class="nav-item active"><span class="nav-item-icon">▦</span> Dashboard</div>
+      <div class="nav-item" onclick="showScreen('send')"><span class="nav-item-icon">↑</span> Send</div>
+      <div class="nav-item" onclick="showScreen('receive')"><span class="nav-item-icon">↓</span> Receive</div>
+      <div class="nav-item"><span class="nav-item-icon">⇄</span> Swap</div>
+      <div class="nav-section-label">Portfolio</div>
+      <div class="nav-item"><span class="nav-item-icon">◎</span> Assets</div>
+      <div class="nav-item"><span class="nav-item-icon">≡</span> Activity</div>
+      <div class="nav-item"><span class="nav-item-icon">★</span> Address Book</div>
+      <div class="nav-section-label">Network</div>
+      <div class="nav-item"><span class="nav-item-icon">◉</span> Mainnet</div>
+      <div style="margin-top:auto;padding:16px 20px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.04);border-radius:var(--radius-md);border:1px solid var(--border);cursor:pointer;" onclick="showScreen('settings')">
+          <span style="font-size:14px;">⚙</span>
+          <span style="font-size:13px;font-weight:500;color:var(--text-secondary);">Settings</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-main">
+      <!-- Balance Hero -->
+      <div class="balance-hero">
+        <div class="balance-label">Total Portfolio Value</div>
+        <div class="balance-amount">$48,294.71</div>
+        <div class="balance-change"><span class="up">▲ $1,247.32 (+2.65%) today</span></div>
+        <div class="action-btns">
+          <button class="action-btn primary" onclick="showScreen('send')">↑ Send</button>
+          <button class="action-btn ghost" onclick="showScreen('receive')">↓ Receive</button>
+          <button class="action-btn ghost">⇄ Swap</button>
+          <button class="action-btn ghost">+ Buy</button>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">24h P&amp;L</div>
+          <div class="stat-val" style="color:var(--accent-green);">+$1,247</div>
+          <div class="stat-sub">+2.65% from yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">30d Change</div>
+          <div class="stat-val" style="color:var(--accent-green);">+18.3%</div>
+          <div class="stat-sub">+$7,441 this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending TXs</div>
+          <div class="stat-val">2</div>
+          <div class="stat-sub">~8 min confirmation</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-title">Portfolio Performance</span>
+          <div class="chart-tabs">
+            <button class="chart-tab">1D</button>
+            <button class="chart-tab active">1W</button>
+            <button class="chart-tab">1M</button>
+            <button class="chart-tab">3M</button>
+            <button class="chart-tab">1Y</button>
+          </div>
+        </div>
+        <div class="chart-canvas">
+          <svg viewBox="0 0 700 140" class="sparkline" style="width:100%;height:100%;">
+            <defs>
+              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4f8ef7" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#4f8ef7" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="30" x2="700" y2="30" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="60" x2="700" y2="60" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="90" x2="700" y2="90" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <line x1="0" y1="120" x2="700" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <!-- Chart area fill -->
+            <path d="M0,110 C40,105 60,95 100,88 C130,82 150,90 190,78 C230,66 250,75 290,55 C320,40 350,60 390,42 C430,28 460,38 500,25 C540,15 570,30 610,18 C650,10 680,22 700,15 L700,140 L0,140 Z" fill="url(#chartGrad)"/>
+            <!-- Chart line -->
+            <path d="M0,110 C40,105 60,95 100,88 C130,82 150,90 190,78 C230,66 250,75 290,55 C320,40 350,60 390,42 C430,28 460,38 500,25 C540,15 570,30 610,18 C650,10 680,22 700,15" fill="none" stroke="#4f8ef7" stroke-width="2"/>
+            <!-- Tooltip dot -->
+            <circle cx="700" cy="15" r="4" fill="#4f8ef7"/>
+            <circle cx="700" cy="15" r="8" fill="rgba(79,142,247,0.25)"/>
+            <!-- X labels -->
+            <text x="0" y="136" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono" font-size="9">Mon</text>
+            <text x="100" y="136" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono" font-size="9">Tue</text>
+            <text x="200" y="136" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono" font-size="9">Wed</text>
+            <text x="300" y="136" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono" font-size="9">Thu</text>
+            <text x="400" y="136" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono" font-size="9">Fri</text>
+            <text x="500" y="136" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono" font-size="9">Sat</text>
+            <text x="600" y="136" fill="rgba(255,255,255,0.25)" font-family="JetBrains Mono" font-size="9">Sun</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Assets -->
+      <div class="chart-card">
+        <div class="assets-header">
+          <span class="assets-title">My Assets</span>
+          <span class="view-all">View All Tokens →</span>
+        </div>
+        <!-- Bitcoin -->
+        <div class="asset-row">
+          <div class="asset-icon" style="background:rgba(245,166,35,0.15);">₿</div>
+          <div class="asset-info">
+            <div class="asset-name">Bitcoin <span class="badge badge-gold">BTC</span></div>
+            <div class="asset-balance">0.58241 BTC</div>
+          </div>
+          <div>
+            <svg width="80" height="32" viewBox="0 0 80 32"><path d="M0,20 C10,18 20,16 30,12 C40,8 50,14 60,10 C70,6 75,8 80,6" fill="none" stroke="#f5a623" stroke-width="1.5"/></svg>
+          </div>
+          <div class="asset-value">
+            <div class="asset-usd">$28,441.22</div>
+            <div class="asset-pct up">▲ 3.12%</div>
+          </div>
+        </div>
+        <!-- Ethereum -->
+        <div class="asset-row">
+          <div class="asset-icon" style="background:rgba(124,92,252,0.12);">Ξ</div>
+          <div class="asset-info">
+            <div class="asset-name">Ethereum <span class="badge badge-purple">ETH</span></div>
+            <div class="asset-balance">4.2180 ETH</div>
+          </div>
+          <div>
+            <svg width="80" height="32" viewBox="0 0 80 32"><path d="M0,24 C15,20 25,14 35,18 C45,22 55,10 65,8 C72,6 76,10 80,8" fill="none" stroke="#7c5cfc" stroke-width="1.5"/></svg>
+          </div>
+          <div class="asset-value">
+            <div class="asset-usd">$13,027.36</div>
+            <div class="asset-pct up">▲ 1.88%</div>
+          </div>
+        </div>
+        <!-- Solana -->
+        <div class="asset-row">
+          <div class="asset-icon" style="background:rgba(34,211,197,0.1);">◎</div>
+          <div class="asset-info">
+            <div class="asset-name">Solana <span class="badge badge-blue">SOL</span></div>
+            <div class="asset-balance">48.500 SOL</div>
+          </div>
+          <div>
+            <svg width="80" height="32" viewBox="0 0 80 32"><path d="M0,18 C10,22 20,26 30,20 C40,14 50,8 60,12 C68,14 74,11 80,9" fill="none" stroke="#22d3c5" stroke-width="1.5"/></svg>
+          </div>
+          <div class="asset-value">
+            <div class="asset-usd">$4,947.50</div>
+            <div class="asset-pct down">▼ 0.43%</div>
+          </div>
+        </div>
+        <!-- BNB -->
+        <div class="asset-row">
+          <div class="asset-icon" style="background:rgba(245,166,35,0.08);">🔶</div>
+          <div class="asset-info">
+            <div class="asset-name">BNB Chain <span class="badge badge-gold">BNB</span></div>
+            <div class="asset-balance">6.380 BNB</div>
+          </div>
+          <div>
+            <svg width="80" height="32" viewBox="0 0 80 32"><path d="M0,16 C12,14 22,22 35,18 C48,14 58,20 68,15 C74,12 77,14 80,12" fill="none" stroke="#f5a623" stroke-width="1.5"/></svg>
+          </div>
+          <div class="asset-value">
+            <div class="asset-usd">$1,878.63</div>
+            <div class="asset-pct up">▲ 0.97%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="chart-card">
+        <div class="assets-header">
+          <span class="assets-title">Recent Activity</span>
+          <span class="view-all">See All →</span>
+        </div>
+        <div class="asset-row">
+          <div class="asset-icon" style="background:rgba(34,211,106,0.1);font-size:14px;">↓</div>
+          <div class="asset-info">
+            <div class="asset-name" style="font-size:13px;">Received ETH</div>
+            <div class="asset-balance">from 0x9a3c…4d12 · 2 hours ago</div>
+          </div>
+          <div class="asset-value">
+            <div style="font-size:14px;font-weight:600;color:var(--accent-green);">+0.85 ETH</div>
+            <div style="font-size:12px;color:var(--text-muted);">+$2,624</div>
+          </div>
+        </div>
+        <div class="asset-row">
+          <div class="asset-icon" style="background:rgba(255,77,77,0.08);font-size:14px;">↑</div>
+          <div class="asset-info">
+            <div class="asset-name" style="font-size:13px;">Sent BTC</div>
+            <div class="asset-balance">to bc1q…7feh · 5 hours ago</div>
+          </div>
+          <div class="asset-value">
+            <div style="font-size:14px;font-weight:600;color:var(--accent-red);">−0.025 BTC</div>
+            <div style="font-size:12px;color:var(--text-muted);">−$1,222</div>
+          </div>
+        </div>
+        <div class="asset-row">
+          <div class="asset-icon" style="background:rgba(34,211,106,0.1);font-size:14px;">↓</div>
+          <div class="asset-info">
+            <div class="asset-name" style="font-size:13px;">Received SOL</div>
+            <div class="asset-balance">from DRpb…9XaW · Yesterday</div>
+          </div>
+          <div class="asset-value">
+            <div style="font-size:14px;font-weight:600;color:var(--accent-green);">+12.0 SOL</div>
+            <div style="font-size:12px;color:var(--text-muted);">+$1,224</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 4: SEND
+══════════════════════════════ -->
+<div class="screen" id="screen-send">
+  <div class="send-layout">
+    <div class="send-main">
+      <div class="send-card">
+        <div class="send-header">
+          <div class="send-title">Send</div>
+          <div class="send-chain-badge">Ξ Ethereum ▾</div>
+          <div class="send-chain-badge">◉ Mainnet ▾</div>
+        </div>
+
+        <!-- Recipient -->
+        <div class="recipient-input-wrap">
+          <div class="input-label">Recipient Address</div>
+          <input class="addr-input" placeholder="0x... or ENS name or paste address" value="0x9a3cF8dE041c2b4491DF244b2f74d12"/>
+        </div>
+
+        <!-- Amount -->
+        <div class="amount-wrap">
+          <div class="input-label">Amount</div>
+          <div class="amount-row">
+            <input class="amount-input" placeholder="0.00" value="0.500"/>
+            <div class="amount-token">Ξ ETH ▾</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="amount-usd">≈ $1,543.40 USD</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:12px;color:var(--text-muted);">Balance: 4.2180 ETH</span>
+              <span class="max-btn">MAX</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fee selector -->
+        <div class="fee-section">
+          <div class="fee-label">Transaction Speed</div>
+          <div class="fee-options">
+            <div class="fee-opt">
+              <div class="fee-opt-name">🐢 Slow</div>
+              <div class="fee-opt-gwei" style="color:var(--accent-green);">12 Gwei</div>
+              <div class="fee-opt-time">~10 min</div>
+            </div>
+            <div class="fee-opt selected">
+              <div class="fee-opt-name">⚡ Standard</div>
+              <div class="fee-opt-gwei" style="color:var(--accent);">18 Gwei</div>
+              <div class="fee-opt-time">~2 min</div>
+            </div>
+            <div class="fee-opt">
+              <div class="fee-opt-name">🚀 Fast</div>
+              <div class="fee-opt-gwei" style="color:var(--accent-red);">28 Gwei</div>
+              <div class="fee-opt-time">~15 sec</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="tx-summary">
+          <div class="tx-row">
+            <span class="tx-row-label">Amount</span>
+            <span class="tx-row-val">0.5000 ETH</span>
+          </div>
+          <div class="tx-row">
+            <span class="tx-row-label">Network Fee</span>
+            <span class="tx-row-val">0.0012 ETH <span style="color:var(--text-muted);font-size:11px;">(~$3.70)</span></span>
+          </div>
+          <div class="tx-row">
+            <span class="tx-row-label" style="font-weight:700;color:var(--text-primary);">Total</span>
+            <span class="tx-row-val total">0.5012 ETH</span>
+          </div>
+        </div>
+
+        <button class="send-submit">Review & Sign Transaction →</button>
+      </div>
+    </div>
+
+    <!-- Right panel: address book / recent -->
+    <div class="send-side">
+      <div class="recent-title">Address Book</div>
+      <div class="recent-addr">
+        <div class="addr-avatar" style="background:rgba(124,92,252,0.15);color:#a88cf8;">R</div>
+        <div class="recent-info"><h4>Raj's Wallet</h4><p>0x9a3c…4d12</p></div>
+        <span style="font-size:12px;color:var(--accent);margin-left:auto;cursor:pointer;">↙</span>
+      </div>
+      <div class="recent-addr">
+        <div class="addr-avatar" style="background:rgba(34,211,197,0.1);color:var(--accent3);">A</div>
+        <div class="recent-info"><h4>Alice</h4><p>0xfe7b…c9aa</p></div>
+        <span style="font-size:12px;color:var(--accent);margin-left:auto;cursor:pointer;">↙</span>
+      </div>
+      <div class="recent-addr">
+        <div class="addr-avatar" style="background:rgba(245,166,35,0.1);color:var(--accent-gold);">E</div>
+        <div class="recent-info"><h4>Exchange Hot Wallet</h4><p>0x3b22…8f01</p></div>
+        <span style="font-size:12px;color:var(--accent);margin-left:auto;cursor:pointer;">↙</span>
+      </div>
+
+      <div class="recent-title" style="margin-top:28px;">Recent Sends</div>
+      <div class="recent-addr">
+        <div class="asset-icon" style="background:rgba(124,92,252,0.1);width:36px;height:36px;font-size:14px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;">Ξ</div>
+        <div class="recent-info"><h4>0x9a3c…4d12</h4><p>0.85 ETH · 2h ago</p></div>
+      </div>
+      <div class="recent-addr">
+        <div class="asset-icon" style="background:rgba(245,166,35,0.1);width:36px;height:36px;font-size:14px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;">₿</div>
+        <div class="recent-info"><h4>bc1q…7feh</h4><p>0.025 BTC · 5h ago</p></div>
+      </div>
+      <div class="recent-addr">
+        <div class="asset-icon" style="background:rgba(34,211,197,0.1);width:36px;height:36px;font-size:14px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;">◎</div>
+        <div class="recent-info"><h4>DRpb…9XaW</h4><p>12.0 SOL · Yesterday</p></div>
+      </div>
+
+      <div style="margin-top:28px;padding:16px;background:rgba(255,77,77,0.05);border:1px solid rgba(255,77,77,0.15);border-radius:var(--radius-md);">
+        <div style="font-size:12px;font-weight:600;color:var(--accent-red);margin-bottom:6px;">⚠ Security Check</div>
+        <div style="font-size:11px;color:var(--text-secondary);line-height:1.6;">Always verify the recipient address on-screen before signing. Transactions cannot be reversed once broadcast.</div>
+      </div>
+
+      <div style="margin-top:16px;padding:16px;background:rgba(34,211,197,0.05);border:1px solid rgba(34,211,197,0.12);border-radius:var(--radius-md);">
+        <div style="font-size:12px;font-weight:600;color:var(--accent3);margin-bottom:6px;">🔒 Signing Process</div>
+        <div style="font-size:11px;color:var(--text-secondary);line-height:1.6;">Your private key is accessed in the main process only. The renderer never touches key material.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 5: RECEIVE
+══════════════════════════════ -->
+<div class="screen" id="screen-receive">
+  <div class="receive-layout">
+    <div class="receive-card">
+      <h2>Receive Assets</h2>
+      <p class="sub">Share your address or QR code to receive crypto from anyone.</p>
+      <div class="chain-selector">
+        <div class="chain-pill active">Ξ Ethereum</div>
+        <div class="chain-pill">₿ Bitcoin</div>
+        <div class="chain-pill">◎ Solana</div>
+        <div class="chain-pill">🔶 BNB</div>
+      </div>
+      <!-- QR Code (generated pattern) -->
+      <div class="qr-frame">
+        <svg viewBox="0 0 210 210" width="168" height="168" xmlns="http://www.w3.org/2000/svg">
+          <!-- Top-left position -->
+          <rect x="10" y="10" width="60" height="60" fill="none" stroke="#000" stroke-width="6"/>
+          <rect x="22" y="22" width="36" height="36" fill="#000"/>
+          <!-- Top-right position -->
+          <rect x="140" y="10" width="60" height="60" fill="none" stroke="#000" stroke-width="6"/>
+          <rect x="152" y="22" width="36" height="36" fill="#000"/>
+          <!-- Bottom-left position -->
+          <rect x="10" y="140" width="60" height="60" fill="none" stroke="#000" stroke-width="6"/>
+          <rect x="22" y="152" width="36" height="36" fill="#000"/>
+          <!-- Data modules (simulated) -->
+          <rect x="80" y="10" width="8" height="8" fill="#000"/><rect x="92" y="10" width="8" height="8" fill="#000"/><rect x="108" y="10" width="8" height="8" fill="#000"/>
+          <rect x="80" y="22" width="8" height="8" fill="#000"/><rect x="108" y="22" width="8" height="8" fill="#000"/>
+          <rect x="92" y="34" width="8" height="8" fill="#000"/><rect x="108" y="34" width="8" height="8" fill="#000"/>
+          <rect x="80" y="46" width="8" height="8" fill="#000"/><rect x="92" y="46" width="8" height="8" fill="#000"/>
+          <rect x="80" y="58" width="8" height="8" fill="#000"/><rect x="108" y="58" width="8" height="8" fill="#000"/>
+          <rect x="10" y="80" width="8" height="8" fill="#000"/><rect x="26" y="80" width="8" height="8" fill="#000"/><rect x="50" y="80" width="8" height="8" fill="#000"/>
+          <rect x="80" y="80" width="8" height="8" fill="#000"/><rect x="92" y="80" width="8" height="8" fill="#000"/><rect x="108" y="80" width="8" height="8" fill="#000"/>
+          <rect x="140" y="80" width="8" height="8" fill="#000"/><rect x="160" y="80" width="8" height="8" fill="#000"/><rect x="192" y="80" width="8" height="8" fill="#000"/>
+          <rect x="10" y="92" width="8" height="8" fill="#000"/><rect x="34" y="92" width="8" height="8" fill="#000"/>
+          <rect x="80" y="92" width="8" height="8" fill="#000"/><rect x="108" y="92" width="8" height="8" fill="#000"/>
+          <rect x="140" y="92" width="8" height="8" fill="#000"/><rect x="156" y="92" width="8" height="8" fill="#000"/>
+          <rect x="10" y="108" width="8" height="8" fill="#000"/><rect x="50" y="108" width="8" height="8" fill="#000"/>
+          <rect x="80" y="108" width="8" height="8" fill="#000"/><rect x="92" y="108" width="8" height="8" fill="#000"/>
+          <rect x="148" y="108" width="8" height="8" fill="#000"/><rect x="168" y="108" width="8" height="8" fill="#000"/>
+          <rect x="80" y="140" width="8" height="8" fill="#000"/><rect x="108" y="140" width="8" height="8" fill="#000"/>
+          <rect x="140" y="140" width="8" height="8" fill="#000"/><rect x="156" y="140" width="8" height="8" fill="#000"/>
+          <rect x="80" y="152" width="8" height="8" fill="#000"/><rect x="92" y="152" width="8" height="8" fill="#000"/><rect x="108" y="152" width="8" height="8" fill="#000"/>
+          <rect x="148" y="152" width="8" height="8" fill="#000"/>
+          <rect x="80" y="168" width="8" height="8" fill="#000"/>
+          <rect x="140" y="168" width="8" height="8" fill="#000"/><rect x="160" y="168" width="8" height="8" fill="#000"/>
+          <rect x="80" y="192" width="8" height="8" fill="#000"/><rect x="96" y="192" width="8" height="8" fill="#000"/>
+          <rect x="140" y="192" width="8" height="8" fill="#000"/><rect x="160" y="192" width="8" height="8" fill="#000"/><rect x="192" y="192" width="8" height="8" fill="#000"/>
+          <!-- CryptoVault center logo -->
+          <rect x="88" y="88" width="34" height="34" rx="4" fill="white" stroke="#eee" stroke-width="1"/>
+          <polygon points="105,93 114,98 114,108 105,113 96,108 96,98" fill="none" stroke="#4f8ef7" stroke-width="2"/>
+          <circle cx="105" cy="103" r="3" fill="#7c5cfc"/>
+        </svg>
+      </div>
+      <div class="addr-display">
+        <span class="addr-text">0x4f2cA3B8dE041c2b4491DF244b2f74d128b3e9a7</span>
+        <button class="copy-btn">Copy</button>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-secondary" style="flex:1;font-size:13px;padding:11px;">Share Address</button>
+        <button class="btn-secondary" style="flex:1;font-size:13px;padding:11px;">Export QR</button>
+      </div>
+    </div>
+
+    <div class="receive-info">
+      <div class="info-block">
+        <h3>Recent Incoming</h3>
+        <div class="tx-hist-item">
+          <div class="tx-hist-icon recv">↓</div>
+          <div class="tx-hist-info"><h4>Received 0.85 ETH</h4><p>0x9a3c…4d12 · 2 hours ago</p></div>
+          <div class="tx-hist-val"><div class="amt up">+0.85 ETH</div><div style="font-size:11px;color:var(--text-muted);">$2,624</div></div>
+        </div>
+        <div class="tx-hist-item">
+          <div class="tx-hist-icon recv">↓</div>
+          <div class="tx-hist-info"><h4>Received 1,200 USDT</h4><p>0xfe7b…c9aa · Yesterday</p></div>
+          <div class="tx-hist-val"><div class="amt up">+1,200 USDT</div><div style="font-size:11px;color:var(--text-muted);">$1,200</div></div>
+        </div>
+        <div class="tx-hist-item">
+          <div class="tx-hist-icon send">↑</div>
+          <div class="tx-hist-info"><h4>Sent 0.025 BTC</h4><p>bc1q…7feh · 5 hours ago</p></div>
+          <div class="tx-hist-val"><div class="amt down">−0.025 BTC</div><div style="font-size:11px;color:var(--text-muted);">$1,222</div></div>
+        </div>
+      </div>
+      <div class="info-block">
+        <h3>Your Addresses</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:16px;">Ξ</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">Ethereum</div>
+              <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">0x4f2c…b3e9</div>
+            </div>
+            <span class="badge badge-blue">Active</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:16px;">₿</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">Bitcoin</div>
+              <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">bc1q…4xm9</div>
+            </div>
+            <span class="badge badge-gold">Active</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:16px;">◎</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">Solana</div>
+              <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">DRpb…9XaW</div>
+            </div>
+            <span class="badge badge-blue">Active</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:16px;">🔶</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;">BNB Chain</div>
+              <div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">0x4f2c…b3e9</div>
+            </div>
+            <span class="badge badge-gold">Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     SCREEN 6: SETTINGS
+══════════════════════════════ -->
+<div class="screen" id="screen-settings">
+  <div class="settings-layout">
+    <div class="settings-nav">
+      <div class="settings-nav-section">Account</div>
+      <div class="settings-nav-item active">🛡️ Security</div>
+      <div class="settings-nav-item">👤 Profile</div>
+      <div class="settings-nav-item">🗝️ Backup &amp; Recovery</div>
+      <div class="settings-nav-section">App</div>
+      <div class="settings-nav-item">🌐 Network &amp; RPC</div>
+      <div class="settings-nav-item">💱 Currency</div>
+      <div class="settings-nav-item">🎨 Appearance</div>
+      <div class="settings-nav-item">🔔 Notifications</div>
+      <div class="settings-nav-section">Advanced</div>
+      <div class="settings-nav-item">🔧 Developer</div>
+      <div class="settings-nav-item">ℹ️ About</div>
+    </div>
+
+    <div class="settings-main">
+      <div class="settings-section">
+        <div class="settings-section-title">Security Settings</div>
+        <div class="settings-section-sub">Manage access controls, encryption, and wallet protection features.</div>
+
+        <!-- Security score -->
+        <div class="security-card">
+          <h3>Security Score</h3>
+          <p>Your wallet has strong security. Enable all items below for maximum protection.</p>
+          <div class="security-score">
+            <div class="score-ring">
+              <div class="score-inner"><span class="score-num" style="color:var(--accent-green);">75</span></div>
+            </div>
+            <div class="score-info">
+              <h4>Good Security</h4>
+              <p>3 of 4 security features active</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="setting-row">
+            <span class="setting-icon">⏱</span>
+            <div class="setting-info">
+              <h4>Auto-Lock Timer</h4>
+              <p>Automatically lock wallet after inactivity period</p>
+            </div>
+            <select class="setting-select">
+              <option>1 minute</option>
+              <option selected>5 minutes</option>
+              <option>15 minutes</option>
+              <option>Never</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <span class="setting-icon">📋</span>
+            <div class="setting-info">
+              <h4>Auto-Clear Clipboard</h4>
+              <p>Clear clipboard after 60 seconds when copying sensitive data</p>
+            </div>
+            <div class="toggle on"><div class="toggle-thumb"></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-icon">🛠</span>
+            <div class="setting-info">
+              <h4>Disable DevTools in Production</h4>
+              <p>Prevents developer console access in production build</p>
+            </div>
+            <div class="toggle on"><div class="toggle-thumb"></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-icon">🔔</span>
+            <div class="setting-info">
+              <h4>Transaction Alerts</h4>
+              <p>Show system notification for every incoming transaction</p>
+            </div>
+            <div class="toggle off"><div class="toggle-thumb"></div></div>
+          </div>
+          <div class="setting-row">
+            <span class="setting-icon">🔑</span>
+            <div class="setting-info">
+              <h4>Change Wallet Password</h4>
+              <p>PBKDF2 + AES-256-GCM encrypted keystore</p>
+            </div>
+            <button class="btn-secondary" style="font-size:12px;padding:8px 16px;">Change →</button>
+          </div>
+        </div>
+
+        <div class="settings-section-title" style="font-size:18px;margin-top:36px;margin-bottom:6px;">Network & RPC</div>
+        <div class="settings-section-sub">Customize node endpoints per chain. Use public or private RPC providers.</div>
+
+        <div class="settings-group">
+          <div class="rpc-item">
+            <div class="rpc-dot green"></div>
+            <div style="flex:1;">
+              <div class="rpc-name">Ethereum Mainnet</div>
+              <div class="rpc-url">https://mainnet.infura.io/v3/…</div>
+            </div>
+            <div class="rpc-latency">42ms</div>
+            <div class="rpc-edit">Edit</div>
+          </div>
+          <div class="rpc-item">
+            <div class="rpc-dot green"></div>
+            <div style="flex:1;">
+              <div class="rpc-name">Bitcoin</div>
+              <div class="rpc-url">https://blockchain.info/</div>
+            </div>
+            <div class="rpc-latency">88ms</div>
+            <div class="rpc-edit">Edit</div>
+          </div>
+          <div class="rpc-item">
+            <div class="rpc-dot green"></div>
+            <div style="flex:1;">
+              <div class="rpc-name">Solana Mainnet</div>
+              <div class="rpc-url">https://mainnet.helius-rpc.com/</div>
+            </div>
+            <div class="rpc-latency">34ms</div>
+            <div class="rpc-edit">Edit</div>
+          </div>
+          <div class="rpc-item">
+            <div class="rpc-dot green"></div>
+            <div style="flex:1;">
+              <div class="rpc-name">BNB Smart Chain</div>
+              <div class="rpc-url">https://bsc-dataseed.binance.org/</div>
+            </div>
+            <div class="rpc-latency">61ms</div>
+            <div class="rpc-edit">Edit</div>
+          </div>
+        </div>
+
+        <div class="settings-section-title" style="font-size:18px;margin-top:36px;margin-bottom:6px;">Display & Currency</div>
+        <div class="settings-section-sub">Localization, fiat currency preferences, and visual options.</div>
+
+        <div class="settings-group">
+          <div class="setting-row">
+            <span class="setting-icon">💵</span>
+            <div class="setting-info">
+              <h4>Fiat Currency</h4>
+              <p>Used for USD equivalents in balance display</p>
+            </div>
+            <select class="setting-select">
+              <option>USD ($)</option>
+              <option>EUR (€)</option>
+              <option>INR (₹)</option>
+              <option>KRW (₩)</option>
+              <option>GBP (£)</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <span class="setting-icon">🌙</span>
+            <div class="setting-info">
+              <h4>Theme</h4>
+              <p>Interface color scheme preference</p>
+            </div>
+            <select class="setting-select">
+              <option selected>Dark (Default)</option>
+              <option>Light</option>
+              <option>System</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <span class="setting-icon">📡</span>
+            <div class="setting-info">
+              <h4>Price Data Source</h4>
+              <p>API used for real-time cryptocurrency prices</p>
+            </div>
+            <select class="setting-select">
+              <option selected>CoinGecko</option>
+              <option>CoinCap</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Screen nav ──
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const btns = document.querySelectorAll('.tab-btn');
+  const labels = ['onboard','create','dashboard','send','receive','settings'];
+  const idx = labels.indexOf(name);
+  if(idx >= 0) btns[idx].classList.add('active');
+}
+
+// ── Mnemonic ──
+const words = ["abandon","ability","able","about","above","absent","absorb","abstract","absurd","abuse","access","accident","account","accuse","achieve","acid","acoustic","acquire","across","act","action","actor","actress","actual","adapt","add","addict","address","adjust","admit","adult","advance","advice","aerobic","afford","afraid","again","age","agent","agree","ahead","aim","air","airport","aisle","alarm","album","alcohol","alert","alien","all","alley","allow","almost","alone","alpha","already","also","alter","always","amateur","amazing","among","amount","amused","analyst","anchor","ancient","anger","angle","angry","animal","ankle","announce","annual","another","answer","antenna","antique","anxiety","any","apart","apology","appear","apple","approve","april","arch","arctic","area","arena","argue","arm","armed","armor","army","around","arrange"];
+let revealed = false;
+function randomMnemonic() {
+  const selected = [];
+  for(let i=0;i<12;i++) selected.push(words[Math.floor(Math.random()*words.length)]);
+  return selected;
+}
+let currentMnemonic = randomMnemonic();
+function renderMnemonic() {
+  const grid = document.getElementById('mnemonic-grid');
+  if(!grid) return;
+  grid.innerHTML = currentMnemonic.map((w,i) => `
+    <div class="mnemonic-word">
+      <span class="word-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="word-text" style="${revealed?'':'filter:blur(5px);user-select:none;'}">${w}</span>
+    </div>`).join('');
+}
+function regenerateMnemonic() { currentMnemonic = randomMnemonic(); renderMnemonic(); }
+function toggleReveal() {
+  revealed = !revealed;
+  document.getElementById('revealBtn').textContent = revealed ? '🙈 Hide Words' : '👁 Reveal Words';
+  renderMnemonic();
+}
+
+// ── Password strength ──
+function checkStrength(val) {
+  let score = 0;
+  if(val.length >= 8) score++;
+  if(val.length >= 12) score++;
+  if(/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+  if(/[^a-zA-Z0-9]/.test(val)) score++;
+  const colors = ['','#ff4d4d','#f5a623','#4f8ef7','#22d36a'];
+  const labels = ['','Weak','Fair','Strong','Very Strong'];
+  for(let i=1;i<=4;i++) {
+    const el = document.getElementById('s'+i);
+    if(el) el.style.background = i <= score ? colors[score] : 'rgba(255,255,255,0.08)';
+  }
+  const lbl = document.getElementById('strength-label');
+  if(lbl) lbl.textContent = val.length === 0 ? 'Enter a password' : (labels[score] || 'Weak');
+}
+
+// ── Init ──
+renderMnemonic();
+</script>
+</body>
+</html>
